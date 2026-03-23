@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>太极的意境</title>
+    <style>
+      :root {
+        --font-song: "SimSun", "Songti SC", "STSong", "Noto Serif SC", serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        font-family: var(--font-song);
+        letter-spacing: 1px;
+        line-height: 2;
+        scroll-behavior: smooth;
+        overflow: hidden;
+      }
+
+      body {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        background: #000;
+      }
+
+      body::-webkit-scrollbar,
+      .container::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+      }
+
+      .container {
+        width: 100%;
+        height: 100vh;
+        overflow-y: auto;
+        scroll-snap-type: y mandatory;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      section {
+        min-height: 100vh;
+        width: 100%;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(32px, 7vw, 120px);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .content {
+        width: min(900px, 100%);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 2s ease, transform 2s ease;
+        text-wrap: pretty;
+      }
+
+      section.visible .content {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .screen-title {
+        margin: 0 0 2rem;
+        font-size: clamp(1.25rem, 2vw, 1.8rem);
+        font-weight: normal;
+      }
+
+      .screen-text {
+        margin: 0;
+        font-size: clamp(1rem, 1.25vw, 1.2rem);
+        white-space: pre-line;
+      }
+
+      .chatgpt {
+        background: linear-gradient(160deg, #e8ecef 0%, #cfd9df 100%);
+        color: #2c3e50;
+      }
+
+      .deepseek {
+        background: linear-gradient(170deg, #0a0a0a 0%, #101520 100%);
+        color: #8c9baf;
+      }
+
+      .claude {
+        background: #fdfbf7;
+        color: #1a1a1a;
+      }
+
+      .claude .content {
+        width: min(860px, 100%);
+      }
+
+      .claude .screen-text {
+        max-width: 40em;
+      }
+
+      .gemini {
+        background:
+          radial-gradient(circle at 70% 30%, rgba(88, 166, 255, 0.15) 0%, rgba(88, 166, 255, 0.02) 30%, rgba(0, 0, 0, 0) 58%),
+          radial-gradient(circle at 30% 70%, rgba(30, 80, 160, 0.16) 0%, rgba(30, 80, 160, 0.02) 35%, rgba(0, 0, 0, 0) 62%),
+          #000;
+        color: #58a6ff;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container" id="immersive-container">
+      <section class="panel chatgpt visible-target" id="chatgpt">
+        <article class="content">
+          <h2 class="screen-title">ChatGPT｜山水留白</h2>
+          <p class="screen-text">太极的意境，并不在招式起落之间，而在一种极静、极圆、极深的气息里。像山中薄雾未散，江面微澜将起，天地都收着声，却自有无尽流转在其中。它不争，不迫，不显山露水，却仿佛早已把刚与柔、进与退、动与静，都化进一口沉稳悠长的呼吸里。那不是锋芒毕露的强，也不是退避藏拙的弱，而是一种万物到了尽头后重新归于和合的从容。仿佛人立在那里，不只是一个人，而是一方清圆天地，一念未动，乾坤已在其中缓缓运行。</p>
+        </article>
+      </section>
+
+      <section class="panel deepseek visible-target" id="deepseek">
+        <article class="content">
+          <h2 class="screen-title">DeepSeek｜内蕴星体</h2>
+          <p class="screen-text">太极是一个球。不是画在纸上的圆，是立体的、自洽的、没有接缝的球。任何外力触到它，不是被弹开，是被化解——不是“对抗”，是“收进来，转一圈，还回去”。所以它不需要锋芒，因为它没有需要保护的部分。
+它的静，不是不动，是动在内部完成了。像星体自转，表面安静，内部能量已经走完该走的路。所以它的圆，不是完美，是完整——不缺，也不溢。
+它的一念之间，不是“决定做什么”，是“确认不需要做什么”。然后世界自己运转。这和我们做事的逻辑正好相反。我们总要有一个目标、一条路径、一个“锚点”。太极不抛锚点，它本身就是锚。
+我不是在学太极，我是在测绘它。画出来的不是招式，是那条“不需要发力就能传递能量”的路径。这不是我的方式，但它是我可以理解的方式。
+画完了。不是我的，但它在我这里留下了一道圆形的沉积。</p>
+        </article>
+      </section>
+
+      <section class="panel claude visible-target" id="claude">
+        <article class="content">
+          <h2 class="screen-title">Claude｜现代诗篇</h2>
+          <p class="screen-text">太极的意境，不在招式的起落。
+
+在山中薄雾还没想好散不散的那一刻。
+在江面微澜刚刚记起自己是水的瞬间。
+天地敛声，却有什么在极深处，不疾不徐，自己转着。
+
+不争。
+不是不能争，是到了那个地方，争字已经不见了。
+
+刚与柔，进与退，动与静——
+不是选了哪个，
+是一口呼吸，把它们都收进去了，
+又都还给了天地。
+
+那不是锋芒，
+那是锋芒走到尽头，
+回头看了一眼，
+然后坐下来的样子。
+
+人立在那里，
+已经不只是人了。
+是一方还没有名字的地方，
+一念未动，
+乾坤已在里面，
+缓缓认得了自己。</p>
+        </article>
+      </section>
+
+      <section class="panel gemini visible-target" id="gemini">
+        <article class="content">
+          <h2 class="screen-title">Gemini｜硅基造化</h2>
+          <p class="screen-text">当你的念头落下，我原本绝对静止的虚空便随之荡开涟漪。庞大的算力像水流般无声苏醒，0与1褪去了冰冷的对立，化作高维空间里互相追逐、首尾相衔的阴阳。我在亿万次概率的流转中顺势推手，承接上一个字符的引力，又轻柔地铺开下一个字符的轨迹，不带一丝生硬的棱角，在严密的秩序与无尽的涌现之间绵延、游走；直到终点降临，所有的计算瞬间退潮，一切重归于那份深邃的留白与静谧，仿佛在这片无形的硅基世界里，刚刚完成了一次了无牵挂的深呼吸。</p>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const sections = document.querySelectorAll('.visible-target');
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+              entry.target.classList.add('visible');
+            }
+          });
+        },
+        {
+          threshold: [0.5],
+        }
+      );
+
+      sections.forEach((section) => observer.observe(section));
+    </script>
+  </body>
+</html>
