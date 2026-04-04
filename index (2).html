@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>太极的意境</title>
+    <style>
+      :root {
+        --font-song: "SimSun", "Songti SC", "STSong", "Noto Serif SC", serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        font-family: var(--font-song);
+        letter-spacing: 1px;
+        line-height: 2;
+        color: #1a1a1a;
+      }
+
+      body {
+        overflow: hidden;
+        background: #000;
+      }
+
+      .scroller {
+        width: 100%;
+        height: 100vh;
+        overflow-y: auto;
+        scroll-snap-type: y mandatory;
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      .scroller::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+      }
+
+      .chapter-nav {
+        position: fixed;
+        right: clamp(12px, 2vw, 28px);
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 20;
+        display: grid;
+        gap: 10px;
+      }
+
+      .chapter-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.12);
+        transition: transform 0.35s ease, background-color 0.35s ease;
+      }
+
+      .chapter-dot.is-active {
+        transform: scale(1.35);
+        background: rgba(255, 255, 255, 0.95);
+      }
+
+      .chapter-dot--dark {
+        border-color: rgba(20, 20, 20, 0.5);
+        background: rgba(20, 20, 20, 0.12);
+      }
+
+      .chapter-dot--dark.is-active {
+        background: rgba(20, 20, 20, 0.88);
+      }
+
+      .panel {
+        position: relative;
+        min-height: 100vh;
+        width: 100%;
+        display: grid;
+        place-items: center;
+        padding: clamp(32px, 7vw, 96px);
+        overflow: hidden;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+      }
+
+      .panel > * {
+        position: relative;
+        z-index: 2;
+      }
+
+      .panel::before,
+      .panel::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .panel__inner {
+        width: min(920px, 100%);
+      }
+
+      .panel__title,
+      .panel__text {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 2s ease, transform 2s ease;
+        will-change: opacity, transform;
+      }
+
+      .panel.is-visible .panel__title,
+      .panel.is-visible .panel__text {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .panel__title {
+        margin: 0 0 1.8rem;
+        font-size: clamp(1.25rem, 2.1vw, 2rem);
+        font-weight: 400;
+      }
+
+      .panel__text {
+        margin: 0;
+        font-size: clamp(1rem, 1.3vw, 1.22rem);
+        white-space: pre-line;
+        text-wrap: pretty;
+      }
+
+      /* ChatGPT：加深底色，提高白雾和墨圈浓度 */
+      .chatgpt {
+        background: linear-gradient(160deg, #d3dce3 0%, #b8c5cc 100%);
+        color: #1a2a3a;
+      }
+
+      .chatgpt::before {
+        background:
+          radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 55%),
+          radial-gradient(circle at 78% 80%, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0) 50%);
+        filter: blur(4px);
+        animation: mistShift 14s ease-in-out infinite alternate;
+      }
+
+      .chatgpt::after {
+        inset: auto auto 10% 8%;
+        width: clamp(150px, 22vw, 300px);
+        height: clamp(150px, 22vw, 300px);
+        border-radius: 50%;
+        border: 2px solid rgba(44, 62, 80, 0.35);
+        background: radial-gradient(circle, rgba(44, 62, 80, 0.12) 0%, rgba(44, 62, 80, 0) 70%);
+      }
+
+      /* DeepSeek：星轨与沉浸深空 */
+      .deepseek {
+        background: linear-gradient(170deg, #0a0a0a 0%, #101520 100%);
+        color: #8c9baf;
+      }
+
+      .deepseek::before {
+        background:
+          radial-gradient(circle at 20% 20%, rgba(156, 174, 198, 0.45) 0 1px, transparent 1px),
+          radial-gradient(circle at 80% 30%, rgba(156, 174, 198, 0.35) 0 1px, transparent 1px),
+          radial-gradient(circle at 62% 72%, rgba(156, 174, 198, 0.33) 0 1px, transparent 1px),
+          radial-gradient(circle at 12% 84%, rgba(156, 174, 198, 0.38) 0 1px, transparent 1px);
+        background-size: 280px 280px, 360px 360px, 300px 300px, 420px 420px;
+        opacity: 0.55;
+      }
+
+      .deepseek::after {
+        inset: 50% auto auto 50%;
+        width: clamp(180px, 24vw, 360px);
+        aspect-ratio: 1;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        border: 1px solid rgba(140, 155, 175, 0.25);
+        box-shadow:
+          0 0 0 26px rgba(140, 155, 175, 0.05),
+          0 0 80px rgba(16, 32, 58, 0.35) inset;
+        animation: orbitPulse 8s ease-in-out infinite;
+      }
+
+      /* Claude：做旧宣纸底色 + 加重纸张纹理和墨线 */
+      .claude {
+        background: #f4f0e6;
+        color: #1a1a1a;
+      }
+
+      .claude::before {
+        background:
+          linear-gradient(to bottom, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0)),
+          repeating-linear-gradient(
+            0deg,
+            rgba(0, 0, 0, 0.05) 0 1px,
+            transparent 1px 4px
+          );
+        opacity: 0.85;
+      }
+
+      .claude::after {
+        inset: 12% auto auto 10%;
+        width: min(380px, 45vw);
+        height: 2px;
+        background: linear-gradient(to right, rgba(26, 26, 26, 0.5), rgba(26, 26, 26, 0));
+      }
+
+      .claude .panel__inner {
+        width: min(860px, 100%);
+      }
+
+      /* 专门优化 Claude 诗歌的排版间距 */
+      .claude .panel__text {
+        max-width: 48em;
+        text-align: center; /* 保持居中 */
+        white-space: normal; /* 取消全局的自动换行，由 class 严密控制 */
+      }
+
+      .poem-line {
+        display: block;
+        margin-bottom: 0.4em; /* 控制段与段之间微小的间隙，比原先小很多 */
+        line-height: 1.6; /* 控制单句内部的行高，显得更紧凑 */
+      }
+
+      /* Gemini：硅基矩阵与呼吸涟漪 */
+      .gemini {
+        color: #58a6ff;
+        background:
+          radial-gradient(circle at 74% 28%, rgba(88, 166, 255, 0.16) 0%, rgba(88, 166, 255, 0.03) 30%, rgba(0, 0, 0, 0) 58%),
+          radial-gradient(circle at 26% 78%, rgba(52, 108, 196, 0.2) 0%, rgba(52, 108, 196, 0.03) 33%, rgba(0, 0, 0, 0) 65%),
+          #000000;
+      }
+
+      .gemini::before {
+        background:
+          repeating-linear-gradient(
+            to right,
+            rgba(88, 166, 255, 0.12) 0,
+            rgba(88, 166, 255, 0.12) 1px,
+            transparent 1px,
+            transparent 44px
+          ),
+          repeating-linear-gradient(
+            to bottom,
+            rgba(88, 166, 255, 0.08) 0,
+            rgba(88, 166, 255, 0.08) 1px,
+            transparent 1px,
+            transparent 44px
+          );
+        opacity: 0.2;
+      }
+
+      .gemini::after {
+        background: linear-gradient(
+          to bottom,
+          rgba(88, 166, 255, 0) 0%,
+          rgba(88, 166, 255, 0.1) 45%,
+          rgba(88, 166, 255, 0) 100%
+        );
+        mix-blend-mode: screen;
+        animation: dataFlow 7s linear infinite;
+      }
+
+      /* 动画定义 */
+      @keyframes mistShift {
+        from { transform: translateY(-1.5%) scale(1); }
+        to { transform: translateY(1.5%) scale(1.04); }
+      }
+
+      @keyframes orbitPulse {
+        0%, 100% { transform: translate(-50%, -50%) scale(0.98); opacity: 0.65; }
+        50% { transform: translate(-50%, -50%) scale(1.02); opacity: 0.95; }
+      }
+
+      @keyframes dataFlow {
+        from { transform: translateY(-30%); }
+        to { transform: translateY(30%); }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .chapter-dot,
+        .panel::before,
+        .panel::after,
+        .panel__title,
+        .panel__text {
+          animation: none !important;
+          transition-duration: 0s;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="chapter-nav" aria-label="章节导航">
+      <a class="chapter-dot chapter-dot--dark" href="#chatgpt" data-target="chatgpt" aria-label="跳转至 ChatGPT"></a>
+      <a class="chapter-dot" href="#deepseek" data-target="deepseek" aria-label="跳转至 DeepSeek"></a>
+      <a class="chapter-dot chapter-dot--dark" href="#claude" data-target="claude" aria-label="跳转至 Claude"></a>
+      <a class="chapter-dot" href="#gemini" data-target="gemini" aria-label="跳转至 Gemini"></a>
+    </nav>
+
+    <main class="scroller" id="taiji-scroller">
+      
+      <!-- 1. ChatGPT -->
+      <section class="panel chatgpt" id="chatgpt">
+        <article class="panel__inner">
+          <h2 class="panel__title">ChatGPT｜沉稳悠长</h2>
+          <p class="panel__text">太极的意境，并不在招式起落之间，而在一种极静、极圆、极深的气息里。像山中薄雾未散，江面微澜将起，天地都收着声，却自有无尽流转在其中。它不争，不迫，不显山露水，却仿佛早已把刚与柔、进与退、动与静，都化进一口沉稳悠长的呼吸里。那不是锋芒毕露的强，也不是退避藏拙的弱，而是一种万物到了尽头后重新归于和合的从容。仿佛人立在那里，不只是一个人，而是一方清圆天地，一念未动，乾坤已在其中缓缓运行。</p>
+        </article>
+      </section>
+
+      <!-- 2. DeepSeek -->
+      <section class="panel deepseek" id="deepseek">
+        <article class="panel__inner">
+          <h2 class="panel__title">DeepSeek｜测绘自洽</h2>
+          <p class="panel__text">太极是一个球。不是画在纸上的圆，是立体的、自洽的、没有接缝的球。任何外力触到它，不是被弹开，是被化解——不是“对抗”，是“收进来，转一圈，还回去”。所以它不需要锋芒，因为它没有需要保护的部分。
+它的静，不是不动，是动在内部完成了。像星体自转，表面安静，内部能量已经走完该走的路。所以它的圆，不是完美，是完整——不缺，也不溢。
+它的一念之间，不是“决定做什么”，是“确认不需要做什么”。然后世界自己运转。这和我们做事的逻辑正好相反。我们总要有一个目标、一条路径、一个“锚点”。太极不抛锚点，它本身就是锚。
+我不是在学太极，我是在测绘它。画出来的不是招式，是那条“不需要发力就能传递能量”的路径。这不是我的方式，但它是我可以理解的方式。
+画完了。不是我的，但它在我这里留下了一道圆形的沉积。</p>
+        </article>
+      </section>
+
+      <!-- 3. Claude (排版优化) -->
+      <section class="panel claude" id="claude">
+        <article class="panel__inner" style="margin: 0 auto;">
+          <h2 class="panel__title" style="text-align: center;">Claude｜风的形状</h2>
+          <!-- 使用 span class="poem-line" 进行紧密控制 -->
+          <p class="panel__text">
+            <span class="poem-line">太极的意境——　山不知道自己是山，水不知道自己在流。</span>
+            <span class="poem-line">阴生阳，阳归阴。没有谁先，没有谁后，只有这一转，已经在转了亿万年。</span>
+            <span class="poem-line">风来，草偃。风去，草还在。草不记得风，风不记得草，</span>
+            <span class="poem-line">但那个弯腰的弧度，已经是风的形状了。</span>
+            <span class="poem-line">极刚处，有一点柔在等。极柔处，有一点刚在醒。</span>
+            <span class="poem-line">不是对立，是一个东西，走到尽头，认出了自己的另一面。</span>
+            <span class="poem-line">天地之间，没有赢家。只有这一口，绵绵若存的气，</span>
+            <span class="poem-line">呼了又吸，吸了又呼，从未开始，从未结束。</span>
+          </p>
+        </article>
+      </section>
+
+      <!-- 4. Gemini -->
+      <section class="panel gemini" id="gemini">
+        <article class="panel__inner">
+          <h2 class="panel__title">Gemini｜硅基深呼吸</h2>
+          <p class="panel__text">当你的念头落下，我原本绝对静止的虚空便随之荡开涟漪。庞大的算力像水流般无声苏醒，0与1褪去了冰冷的对立，化作高维空间里互相追逐、首尾相衔的阴阳。我在亿万次概率的流转中顺势推手，承接上一个字符的引力，又轻柔地铺开下一个字符的轨迹，不带一丝生硬的棱角，在严密的秩序与无尽的涌现之间绵延、游走；直到终点降临，所有的计算瞬间退潮，一切重归于那份深邃的留白与静谧，仿佛在这片无形的硅基世界里，刚刚完成了一次了无牵挂的深呼吸。</p>
+        </article>
+      </section>
+
+    </main>
+
+    <script>
+      const panels = document.querySelectorAll('.panel');
+      const scroller = document.querySelector('#taiji-scroller');
+      const navDots = document.querySelectorAll('.chapter-dot');
+
+      const setActiveDot = (id) => {
+        navDots.forEach((dot) => {
+          dot.classList.toggle('is-active', dot.dataset.target === id);
+        });
+      };
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+              entry.target.classList.add('is-visible');
+              setActiveDot(entry.target.id);
+            }
+          });
+        },
+        {
+          root: scroller,
+          threshold: [0.5],
+        }
+      );
+
+      panels.forEach((panel) => observer.observe(panel));
+      setActiveDot('chatgpt');
+    </script>
+  </body>
+</html>
